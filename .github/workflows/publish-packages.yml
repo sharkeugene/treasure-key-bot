@@ -1,0 +1,24 @@
+name: Publish All Packages
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.3.0
+      - run: git config --global user.email "example@gmail.com"
+      - run: git config --global user.name "Builder"
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Install Packages
+        run: yarn
+      - name: Publish Win
+        run: yarn publish-ci
+      - name: Publish Mac
+        run: yarn publish-ci

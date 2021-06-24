@@ -11,7 +11,7 @@ import {
   message,
   Form,
   Divider,
-  Checkbox,
+  Slider,
 } from "antd";
 import "antd/dist/antd.css";
 
@@ -24,6 +24,7 @@ const App = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [snipeModeOn, setSnipeModeOn] = useState(false);
   const [afkModeOn, setAFKModeOn] = useState(false);
+  const [keysToBuy, setKeysToBuy] = useState(1);
 
   const login = useCallback((e) => {
     const newSettings = {
@@ -40,10 +41,13 @@ const App = () => {
     setSnipeModeOn(true);
   }, []);
 
-  const startAFKMode = useCallback((e) => {
-    setAFKModeOn(true);
-    ipcRenderer.send("enableAFKMode", {});
-  }, []);
+  const startAFKMode = useCallback(
+    (e) => {
+      setAFKModeOn(true);
+      ipcRenderer.send("enableAFKMode", { keysToBuy });
+    },
+    [keysToBuy]
+  );
 
   const logout = useCallback((e) => {
     settings.set("settings", {});
@@ -103,8 +107,7 @@ const App = () => {
                 <Divider>Bot Configuration</Divider>
                 <br />
                 <div>
-                  <label>Round Start Sniper</label>
-                  <br />
+                  <h3>Round Start Sniper</h3>
                   <br />
                   <Button
                     loading={connecting}
@@ -118,8 +121,16 @@ const App = () => {
                 </div>
                 <br />
                 <div>
-                  <label>AFK Mode</label>
+                  <h3>AFK Mode</h3>
                   <br />
+                  <p>Number of keys to buy</p>
+                  <Slider
+                    value={keysToBuy}
+                    onChange={(e) => setKeysToBuy(e)}
+                    min={1}
+                    max={2}
+                    step={0.1}
+                  />
                   <br />
                   <Button
                     loading={connecting}
@@ -142,7 +153,7 @@ const App = () => {
             style={{ marginLeft: 0, marginRight: 0, marginTop: 16 }}
           >
             <Col span={22} offset={1}>
-              <label>Logout</label>
+              <h3>Logout</h3>
               <br />
               <br />
               <Button
