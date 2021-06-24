@@ -11,6 +11,12 @@ To run this project.
   yarn
 ```
 
+- Generate contract artifacts
+
+```bash
+  yarn generate
+```
+
 - Now run these two commands in separate consoles.
 
 ```bash

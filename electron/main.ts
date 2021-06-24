@@ -81,9 +81,8 @@ function createWindow() {
 
   // TODO: need test logic works
   ipcMain.on("enableAFKMode", async (_, arg) => {
-    console.log("Starting AFK mode")
+    console.log("Starting AFK mode...")
     if (AFK_MODE_INTERVAL === null) {
-      console.log("Starting AFK mode...")
       AFK_MODE_INTERVAL = setInterval(async () => {
         const info = await getCurrentRoundInfo(CONTRACTS.better);
         const player = await getPlayerInfo(
@@ -105,7 +104,7 @@ function createWindow() {
           IS_BUYING = false;
         }
         
-      }, 500);
+      }, 1500);
     } else {
       clearInterval(AFK_MODE_INTERVAL);
       AFK_MODE_INTERVAL = null;

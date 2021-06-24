@@ -4,6 +4,7 @@
   "description": "Treasure key bot to help players play the game automatically",
   "main": "./dist/main.js",
   "scripts": {
+    "generate": "hardhat compile && hardhat typechain",
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development && electron .",
     "dev:react": "NODE_ENV=development webpack-dev-server --config webpack.react.config.js --mode development",
     "build:electron": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production",
