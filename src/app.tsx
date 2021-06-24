@@ -52,7 +52,6 @@ const App = () => {
 
   useEffect(() => {
     ipcRenderer.on("loginSuccess", () => {
-      console.log("works?")
       message.success("Private key saved!");
       setLoginSuccess(true);
       setConnecting(false);
@@ -61,6 +60,9 @@ const App = () => {
       message.error("Failed to save private key, please ensure it is valid!");
       setLoginSuccess(false);
       setConnecting(false);
+    });
+    ipcRenderer.on("logs", (e) => {
+      console.log(e);
     });
 
     settings.get("settings").then((e: any) => {
