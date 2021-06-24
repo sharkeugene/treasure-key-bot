@@ -3,6 +3,5 @@ dist
 outputs
 release-builds
 cache
-artifacts
 typechain
 .vscode
