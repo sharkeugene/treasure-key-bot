@@ -5,22 +5,18 @@ To run this project.
 
 - Clone this repo
 
-```bash
-  git clone https://github.com/elisealcala/electron-react-ts.git
-```
-
 - Install the dependencies
 
 ```bash
-  npm install
+  yarn
 ```
 
 - Now run these two commands in separate consoles.
 
 ```bash
-  npm run dev:react
+  yarn dev:react
 ```
 
 ```bash
-  npm run dev:electron
+  yarn dev:electron
 ```
