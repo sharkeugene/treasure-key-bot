@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
 import Web3 from "web3";
 
+export const EMPTY_AFFLIATE =
+  "0x0000000000000000000000000000000000000000000000000000000000000000";
+
 type Response = {
   0: string;
   1: string;
@@ -75,4 +78,27 @@ export async function getPlayerInfo(better: any, account: string) {
     roundBNB: playerInfo[6],
     // bnbBalance: Web3.utils.fromWei(bnbBalance),
   };
+}
+
+/**
+ * Function to buy keys
+ * @param better Game contract
+ * @param account Account address
+ * @param numKeys Number of keys to buy in Ethers e.g. if i wish to buy 1.1 keys, i will input "1.1"
+ * @returns
+ */
+export async function buyKeys(better: any, account: string, numKeys: string) {
+  const price = await better?.methods
+    .iWantXKeys(Web3.utils.toWei(`${numKeys}`, "ether"))
+    .call();
+  const gas = await better?.methods
+    .buyXname(EMPTY_AFFLIATE)
+    .estimateGas({ from: account, value: price });
+  console.log("Gas limit", `${parseInt(`${gas * 1.5}`)}`);
+  await better?.methods.buyXname(EMPTY_AFFLIATE).send({
+    from: account,
+    value: price,
+    gas: `${parseInt(`${gas * 1.6}`)}`,
+    gasPrice: 7000000000,
+  });
 }
