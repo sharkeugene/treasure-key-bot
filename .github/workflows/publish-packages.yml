@@ -18,6 +18,13 @@ jobs:
       - name: Install Packages
         run: yarn
       - name: Publish Win
-        run: yarn publish-ci
+        run: yarn dist:win
       - name: Publish Mac
-        run: yarn publish-ci
+        run: yarn dist:mac
+      - name: Upload mac artifact
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: '*.dmg'
+  
