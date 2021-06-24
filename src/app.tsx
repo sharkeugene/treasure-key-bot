@@ -22,6 +22,8 @@ const App = () => {
   const [form] = Form.useForm();
   const [connecting, setConnecting] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [snipeModeOn, setSnipeModeOn] = useState(false);
+  const [afkModeOn, setAFKModeOn] = useState(false);
 
   const login = useCallback((e) => {
     const newSettings = {
@@ -31,13 +33,15 @@ const App = () => {
     setConnecting(true);
   }, []);
 
-  const startBot = useCallback((e) => {
-    if (e.startMode) {
-      ipcRenderer.send("enableStartSnipe", e);
-    } 
-    if (e.afkMode) {
-      ipcRenderer.send("enableAFKMode", e);
-    }
+  const startSnipeMode = useCallback((e) => {
+    console.log("starting")
+    ipcRenderer.send("enableStartSnipe", {});
+    setSnipeModeOn(true);
+  }, []);
+
+  const startAFKMode = useCallback((e) => {
+    setAFKModeOn(true);
+    ipcRenderer.send("enableAFKMode", {});
   }, []);
 
   useEffect(() => {
@@ -86,21 +90,39 @@ const App = () => {
             )}
 
             {loginSuccess && (
-              <Form form={form} onFinish={startBot}>
+              <div>
                 <Divider>Bot Configuration</Divider>
-
-                <Form.Item label="Round Start Sniper" name="startMode">
-                  <Checkbox>Deactivated</Checkbox>
-                </Form.Item>
-
-                <Form.Item label="AFK mode" name="afkMode">
-                  <Checkbox>Deactivated</Checkbox>
-                </Form.Item>
-
-                <Button loading={connecting} type="primary" htmlType="submit">
-                  Save Bot Settings
-                </Button>
-              </Form>
+                <br />
+                <div>
+                  <label>Round Start Sniper</label>
+                  <br />
+                  <br />
+                  <Button
+                    loading={connecting}
+                    type={"primary"}
+                    htmlType="submit"
+                    danger={snipeModeOn}
+                    onClick={startSnipeMode}
+                  >
+                    Start Round Sniper
+                  </Button>
+                </div>
+                <br />
+                <div>
+                  <label>AFK Mode</label>
+                  <br />
+                  <br />
+                  <Button
+                    loading={connecting}
+                    type={"primary"}
+                    htmlType="submit"
+                    danger={afkModeOn}
+                    onClick={startAFKMode}
+                  >
+                    Start AFK Mode
+                  </Button>
+                </div>
+              </div>
             )}
           </Col>
         </Row>

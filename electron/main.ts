@@ -59,7 +59,9 @@ function createWindow() {
   });
 
   ipcMain.on("enableStartSnipe", async (_, arg) => {
+    console.log("Starting snipe")
     if (SNIPE_START_INTERVAL === null) {
+      console.log("Starting start snipe mode...")
       SNIPE_START_INTERVAL = setInterval(async () => {
         const info = await getCurrentRoundInfo(CONTRACTS.better);
         const player = await getPlayerInfo(
