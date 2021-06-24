@@ -2,7 +2,7 @@ name: Publish All Packages
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   publish-gpr:
     runs-on: ubuntu-latest
