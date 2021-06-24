@@ -31,10 +31,11 @@ const App = () => {
     };
     settings.set("settings", newSettings);
     setConnecting(true);
+    ipcRenderer.send("login", { password: e.password });
   }, []);
 
   const startSnipeMode = useCallback((e) => {
-    console.log("starting")
+    console.log("starting");
     ipcRenderer.send("enableStartSnipe", {});
     setSnipeModeOn(true);
   }, []);
@@ -44,8 +45,14 @@ const App = () => {
     ipcRenderer.send("enableAFKMode", {});
   }, []);
 
+  const logout = useCallback((e) => {
+    settings.set("settings", {});
+    setLoginSuccess(false);
+  }, []);
+
   useEffect(() => {
     ipcRenderer.on("loginSuccess", () => {
+      console.log("works?")
       message.success("Private key saved!");
       setLoginSuccess(true);
       setConnecting(false);
@@ -126,6 +133,27 @@ const App = () => {
             )}
           </Col>
         </Row>
+
+        {loginSuccess && (
+          <Row
+            gutter={16}
+            style={{ marginLeft: 0, marginRight: 0, marginTop: 16 }}
+          >
+            <Col span={22} offset={1}>
+              <label>Logout</label>
+              <br />
+              <br />
+              <Button
+                loading={connecting}
+                type={"primary"}
+                htmlType="submit"
+                onClick={logout}
+              >
+                Logout
+              </Button>
+            </Col>
+          </Row>
+        )}
       </Layout.Content>
     </Layout>
   );

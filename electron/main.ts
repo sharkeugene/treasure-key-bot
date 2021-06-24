@@ -48,16 +48,14 @@ function createWindow() {
     );
   }
 
-  ipcMain.on("login", (_, arg) => {
+  ipcMain.on("login", async (_, arg) => {
     const { password } = arg;
-    load(password)
-      .then((contracts) => {
-        CONTRACTS = contracts;
-        mainWindow?.webContents?.send?.("loginSuccess", true);
-      })
-      .catch(() => {
-        mainWindow?.webContents?.send?.("loginFailed", true);
-      });
+    try {
+      CONTRACTS = await load(password);
+      mainWindow?.webContents?.send?.("loginSuccess", true);
+    } catch (e) {
+      mainWindow?.webContents?.send?.("loginFailed", true);
+    }
   });
 
   ipcMain.on("enableStartSnipe", async (_, arg) => {
@@ -100,7 +98,7 @@ function createWindow() {
         if (secondsToEnd < 20 && !IS_BUYING && !isLeading) {
           IS_BUYING = true;
           console.log("Buying key now...");
-          await buyKeys(CONTRACTS.better, CONTRACTS.account.address, "0.1");
+          await buyKeys(CONTRACTS.better, CONTRACTS.account.address, "1");
           IS_BUYING = false;
         }
         
