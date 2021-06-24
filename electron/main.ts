@@ -8,7 +8,8 @@ type Await<T> = T extends PromiseLike<infer U> ? U : T;
 
 let mainWindow: Electron.BrowserWindow | null;
 let CONTRACTS: Await<ReturnType<typeof load>> = {} as any;
-let ACTIVE_INTERVAL: NodeJS.Timeout | null = null;
+let AFK_MODE_INTERVAL: NodeJS.Timeout | null = null;
+let SNIPE_START_INTERVAL: NodeJS.Timeout | null = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -58,8 +59,8 @@ function createWindow() {
   });
 
   ipcMain.on("enableStartSnipe", async (_, arg) => {
-    if (ACTIVE_INTERVAL === null) {
-      ACTIVE_INTERVAL = setInterval(async () => {
+    if (SNIPE_START_INTERVAL === null) {
+      SNIPE_START_INTERVAL = setInterval(async () => {
         const info = await getCurrentRoundInfo(CONTRACTS.better);
         const player = await getPlayerInfo(
           CONTRACTS.better,
@@ -69,8 +70,8 @@ function createWindow() {
         console.log(player);
       }, 3000);
     } else {
-      clearInterval(ACTIVE_INTERVAL);
-      ACTIVE_INTERVAL = null;
+      clearInterval(SNIPE_START_INTERVAL);
+      SNIPE_START_INTERVAL = null;
     }
   });
 

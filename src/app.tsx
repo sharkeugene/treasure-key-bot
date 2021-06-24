@@ -32,7 +32,12 @@ const App = () => {
   }, []);
 
   const startBot = useCallback((e) => {
-    ipcRenderer.send("enableStartSnipe", e);
+    if (e.startMode) {
+      ipcRenderer.send("enableStartSnipe", e);
+    } 
+    if (e.afkMode) {
+      ipcRenderer.send("enableAFKMode", e);
+    }
   }, []);
 
   useEffect(() => {
@@ -84,11 +89,11 @@ const App = () => {
               <Form form={form} onFinish={startBot}>
                 <Divider>Bot Configuration</Divider>
 
-                <Form.Item label="Round Start Sniper" name="password">
+                <Form.Item label="Round Start Sniper" name="startMode">
                   <Checkbox>Deactivated</Checkbox>
                 </Form.Item>
 
-                <Form.Item label="AFK mode" name="password">
+                <Form.Item label="AFK mode" name="afkMode">
                   <Checkbox>Deactivated</Checkbox>
                 </Form.Item>
 
