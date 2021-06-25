@@ -2,7 +2,8 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import * as url from "url";
 import { load } from "./contracts";
-import { buyKeys, getCurrentRoundInfo, getPlayerInfo } from "./bot";
+import { buyKeys, buyWithETH, getCurrentRoundInfo, getPlayerInfo } from "./bot";
+import Web3 from "web3";
 
 type Await<T> = T extends PromiseLike<infer U> ? U : T;
 
@@ -13,6 +14,13 @@ let SNIPE_START_INTERVAL: NodeJS.Timeout | null = null;
 
 let LAST_ROUND = "0";
 let IS_BUYING = false;
+
+// SNIPE mode variables
+let SNIPE_ETH_TO_SPEND = "1";
+
+// AFK mode variables
+let AFK_KEYS_TO_BUY = "1.1"; // number of keys to buy
+let AFK_SECONDS_TO_BUY = 15; // number of seconds before bot starts sending a buy order
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -65,6 +73,10 @@ function createWindow() {
   // TODO: enable the use of settings to tweak number of keys bought
   //TODO: enable the use of settings to tweak frequency of polling
   ipcMain.on("enableStartSnipe", async (_, arg) => {
+    const { ethToSpend } = arg;
+    console.log({ ethToSpend });
+    SNIPE_ETH_TO_SPEND = `${ethToSpend}`;
+
     // Stores the current round ID, when bot is turned on
     const info = await getCurrentRoundInfo(CONTRACTS.better);
     LAST_ROUND = info.roundId;
@@ -77,14 +89,18 @@ function createWindow() {
           IS_BUYING = true;
           LAST_ROUND = info.roundId;
           console.log("Sniping for keys now...");
-          await buyKeys(CONTRACTS.better, CONTRACTS.account.address, "140");
+          await buyWithETH(
+            CONTRACTS.better,
+            CONTRACTS.account.address,
+            Web3.utils.toWei(SNIPE_ETH_TO_SPEND, "ether")
+          );
           mainWindow?.webContents?.send?.(
             "logs",
             `[StartSniper] - Bought 140 keys at ${Date.now()}`
           );
           IS_BUYING = false;
         }
-      }, 500);
+      }, 800);
     } else {
       console.log("Closing snipe mode...");
       clearInterval(SNIPE_START_INTERVAL);
@@ -98,6 +114,11 @@ function createWindow() {
 
   // TODO: need test logic works
   ipcMain.on("enableAFKMode", async (_, arg) => {
+    const { keysToBuy = "1.1", secondsToBuy = 15 } = arg;
+    console.log({ keysToBuy, secondsToBuy });
+    AFK_KEYS_TO_BUY = `${keysToBuy}`;
+    AFK_SECONDS_TO_BUY = secondsToBuy;
+
     if (AFK_MODE_INTERVAL === null) {
       console.log("Starting AFK mode...");
       AFK_MODE_INTERVAL = setInterval(async () => {
@@ -115,10 +136,14 @@ function createWindow() {
         console.log(info);
         console.log(player);
 
-        if (secondsToEnd < 15 && !IS_BUYING && !isLeading) {
+        if (secondsToEnd < AFK_SECONDS_TO_BUY && !IS_BUYING && !isLeading) {
           IS_BUYING = true;
           console.log("Buying key now...");
-          await buyKeys(CONTRACTS.better, CONTRACTS.account.address, "1");
+          await buyKeys(
+            CONTRACTS.better,
+            CONTRACTS.account.address,
+            AFK_KEYS_TO_BUY
+          );
           mainWindow?.webContents?.send?.(
             "logs",
             `[AFKMode] - Bought a key at ${Date.now()}`
@@ -130,10 +155,7 @@ function createWindow() {
       console.log("Closing AFK mode...");
       clearInterval(AFK_MODE_INTERVAL);
       AFK_MODE_INTERVAL = null;
-      mainWindow?.webContents?.send?.(
-        "logs",
-        `[AFKMode] - Shutting bot down`
-      );
+      mainWindow?.webContents?.send?.("logs", `[AFKMode] - Shutting bot down`);
     }
   });
 

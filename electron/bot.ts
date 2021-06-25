@@ -102,3 +102,27 @@ export async function buyKeys(better: any, account: string, numKeys: string) {
     gasPrice: 7000000000,
   });
 }
+
+/**
+ * Function to buy based on ETH amount
+ * @param better Game contract
+ * @param account Account address
+ * @param numKeys Number of keys to buy in Ethers e.g. if i wish to buy 1.1 keys, i will input "1.1"
+ * @returns
+ */
+export async function buyWithETH(
+  better: any,
+  account: string,
+  ethInWei: string
+) {
+  const gas = await better?.methods
+    .buyXname(EMPTY_AFFLIATE)
+    .estimateGas({ from: account, value: ethInWei });
+  console.log("Gas limit", `${parseInt(`${gas * 1.6}`)}`);
+  await better?.methods.buyXname(EMPTY_AFFLIATE).send({
+    from: account,
+    value: ethInWei,
+    gas: `${parseInt(`${gas * 1.6}`)}`,
+    gasPrice: 7000000000,
+  });
+}

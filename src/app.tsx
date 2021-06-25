@@ -12,6 +12,7 @@ import {
   Form,
   Divider,
   Slider,
+  InputNumber,
 } from "antd";
 import "antd/dist/antd.css";
 
@@ -24,7 +25,9 @@ const App = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [snipeModeOn, setSnipeModeOn] = useState(false);
   const [afkModeOn, setAFKModeOn] = useState(false);
-  const [keysToBuy, setKeysToBuy] = useState(1);
+  const [keysToBuy, setKeysToBuy] = useState(1.1);
+  const [secondsToBuy, setSecondsToBuy] = useState(15);
+  const [ethToSpend, setEthToSpend] = useState(1.0);
 
   const login = useCallback((e) => {
     const newSettings = {
@@ -35,18 +38,31 @@ const App = () => {
     ipcRenderer.send("login", { password: e.password });
   }, []);
 
-  const startSnipeMode = useCallback((e) => {
-    console.log("starting");
-    ipcRenderer.send("enableStartSnipe", {});
-    setSnipeModeOn(true);
-  }, []);
+  const startSnipeMode = useCallback(
+    (e) => {
+      console.log("starting");
+      setSnipeModeOn(!snipeModeOn);
+      ipcRenderer.send("enableStartSnipe", { ethToSpend });
+      if (!snipeModeOn) {
+        message.success("Start round sniper on!");
+      } else {
+        message.success("Start round sniper off!");
+      }
+    },
+    [ethToSpend, snipeModeOn]
+  );
 
   const startAFKMode = useCallback(
     (e) => {
-      setAFKModeOn(true);
-      ipcRenderer.send("enableAFKMode", { keysToBuy });
+      setAFKModeOn(!afkModeOn);
+      ipcRenderer.send("enableAFKMode", { keysToBuy, secondsToBuy });
+      if (!afkModeOn) {
+        message.success("AFK mode on!");
+      } else {
+        message.success("AFK mode off!");
+      }
     },
-    [keysToBuy]
+    [keysToBuy, secondsToBuy, afkModeOn]
   );
 
   const logout = useCallback((e) => {
@@ -56,7 +72,7 @@ const App = () => {
 
   useEffect(() => {
     ipcRenderer.on("loginSuccess", () => {
-      message.success("Private key saved!");
+      message.success("Private key loaded!");
       setLoginSuccess(true);
       setConnecting(false);
     });
@@ -108,6 +124,14 @@ const App = () => {
                 <br />
                 <div>
                   <h3>Round Start Sniper</h3>
+                  <p>Number of BNB to spend when sniping</p>
+                  <InputNumber
+                    value={ethToSpend}
+                    onChange={(e) => setEthToSpend(parseFloat(`${e}`) ?? 1)}
+                    min={0.0000001}
+                    step={0.00001}
+                  />
+                  <br />
                   <br />
                   <Button
                     loading={connecting}
@@ -122,7 +146,6 @@ const App = () => {
                 <br />
                 <div>
                   <h3>AFK Mode</h3>
-                  <br />
                   <p>Number of keys to buy</p>
                   <Slider
                     value={keysToBuy}
@@ -131,6 +154,15 @@ const App = () => {
                     max={2}
                     step={0.1}
                   />
+                  <br />
+                  <p>Buy when timer is left with (seconds)</p>
+                  <InputNumber
+                    value={secondsToBuy}
+                    onChange={(e) => setSecondsToBuy(parseInt(`${e}`) ?? 15)}
+                    min={1}
+                    step={1}
+                  />
+                  <br />
                   <br />
                   <Button
                     loading={connecting}
@@ -150,12 +182,15 @@ const App = () => {
         {loginSuccess && (
           <Row
             gutter={16}
-            style={{ marginLeft: 0, marginRight: 0, marginTop: 16 }}
+            style={{
+              marginLeft: 0,
+              marginRight: 0,
+              marginTop: 16,
+              marginBottom: 32,
+            }}
           >
             <Col span={22} offset={1}>
               <h3>Logout</h3>
-              <br />
-              <br />
               <Button
                 loading={connecting}
                 type={"primary"}
