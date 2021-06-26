@@ -19,6 +19,9 @@ jobs:
         run: yarn
       - name: Build
         run: yarn build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Publish Win
       #   run: yarn dist:win
       - name: Publish Mac
