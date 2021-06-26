@@ -19,16 +19,16 @@ jobs:
         run: yarn
       - name: Build
         run: yarn build
-      - name: Publish Win
-        run: yarn dist:win
+      # - name: Publish Win
+      #   run: yarn dist:win
       - name: Publish Mac
         run: yarn dist:mac
-      - name: Upload win artifact
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: '*.exe'
+      # - name: Upload win artifact
+      #   uses: skx/github-action-publish-binaries@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     args: '*.exe'
   
       - name: Upload mac artifact
         uses: skx/github-action-publish-binaries@master
