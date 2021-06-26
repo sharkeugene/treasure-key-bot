@@ -17,6 +17,7 @@ let IS_BUYING = false;
 
 // SNIPE mode variables
 let SNIPE_ETH_TO_SPEND = "1";
+let SNIPE_GAS_TO_SPEND = "10";
 
 // AFK mode variables
 let AFK_KEYS_TO_BUY = "1.1"; // number of keys to buy
@@ -73,9 +74,10 @@ function createWindow() {
   // TODO: enable the use of settings to tweak number of keys bought
   //TODO: enable the use of settings to tweak frequency of polling
   ipcMain.on("enableStartSnipe", async (_, arg) => {
-    const { ethToSpend } = arg;
-    console.log({ ethToSpend });
+    const { ethToSpend, gasToSpend = "10" } = arg;
+    console.log({ ethToSpend, gasToSpend });
     SNIPE_ETH_TO_SPEND = `${ethToSpend}`;
+    SNIPE_GAS_TO_SPEND = gasToSpend;
 
     // Stores the current round ID, when bot is turned on
     const info = await getCurrentRoundInfo(CONTRACTS.better);
@@ -92,7 +94,8 @@ function createWindow() {
           await buyWithETH(
             CONTRACTS.better,
             CONTRACTS.account.address,
-            Web3.utils.toWei(SNIPE_ETH_TO_SPEND, "ether")
+            Web3.utils.toWei(SNIPE_ETH_TO_SPEND, "ether"),
+            SNIPE_GAS_TO_SPEND
           );
           mainWindow?.webContents?.send?.(
             "logs",

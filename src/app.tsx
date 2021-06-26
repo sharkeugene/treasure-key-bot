@@ -28,6 +28,7 @@ const App = () => {
   const [keysToBuy, setKeysToBuy] = useState(1.1);
   const [secondsToBuy, setSecondsToBuy] = useState(15);
   const [ethToSpend, setEthToSpend] = useState(1.0);
+  const [gasToSpend, setGasToSpend] = useState(5);
 
   const login = useCallback((e) => {
     const newSettings = {
@@ -42,14 +43,14 @@ const App = () => {
     (e) => {
       console.log("starting");
       setSnipeModeOn(!snipeModeOn);
-      ipcRenderer.send("enableStartSnipe", { ethToSpend });
+      ipcRenderer.send("enableStartSnipe", { ethToSpend, gasToSpend });
       if (!snipeModeOn) {
         message.success("Start round sniper on!");
       } else {
         message.success("Start round sniper off!");
       }
     },
-    [ethToSpend, snipeModeOn]
+    [ethToSpend, gasToSpend, snipeModeOn]
   );
 
   const startAFKMode = useCallback(
@@ -130,6 +131,16 @@ const App = () => {
                     onChange={(e) => setEthToSpend(parseFloat(`${e}`) ?? 1)}
                     min={0.0000001}
                     step={0.00001}
+                  />
+                  <br />
+                  <br />
+                  <p>Gas price when sniping</p>
+                  <InputNumber
+                    value={gasToSpend}
+                    onChange={(e) => setGasToSpend(parseFloat(`${e}`) ?? 1)}
+                    min={5}
+                    step={1}
+                    max={1000}
                   />
                   <br />
                   <br />
