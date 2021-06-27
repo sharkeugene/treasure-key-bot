@@ -6,6 +6,9 @@ on:
 jobs:
   publish-gpr:
     runs-on: macos-latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -19,19 +22,26 @@ jobs:
         run: yarn
       - name: Build
         run: yarn build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Package Win
         run: yarn dist:win
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: treasurekeybot-setup.exe
+      #     path: outputs/*.exe
+      - id: release
+        uses: rymndhng/release-on-push-action@master
         with:
-          name: setup.exe
-          path: outputs/*.exe
-
+          bump_version_scheme: minor
+          tag_prefix: v
+      - name: Check Output Parameters
+        run: |
+          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+          echo "Got release version ${{ steps.release.outputs.version }}"
+      - name: attach artifacts
+        uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: outputs/*.exe
 
 
       # - name: Publish Mac
