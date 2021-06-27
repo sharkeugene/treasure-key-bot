@@ -1,6 +1,6 @@
 {
   "name": "treasure-key-bot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Treasure key bot to help players play the game automatically",
   "main": "./dist/main.js",
   "scripts": {
@@ -20,7 +20,6 @@
     "version": "npm run build",
     "postversion": "git push && git push --tags && echo \"release artifacts created, tag $npm_package_version created on github, create new release at https://github.com/sharkeugene/treasure-key-bot/releases/new?tag=v$npm_package_version\"",
     "bump": "npm version patch -m \"bump version to %s\""
-
   },
   "keywords": [],
   "author": "shark",
