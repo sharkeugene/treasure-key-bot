@@ -3,6 +3,8 @@ import Web3 from "web3";
 
 export const EMPTY_AFFLIATE =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
+export const BOT_AFFILIATE =
+  "0x677265796265617264000000000000000000000000000000000000000000000";
 
 type Response = {
   0: string;
@@ -92,10 +94,10 @@ export async function buyKeys(better: any, account: string, numKeys: string) {
     .iWantXKeys(Web3.utils.toWei(`${numKeys}`, "ether"))
     .call();
   const gas = await better?.methods
-    .buyXname(EMPTY_AFFLIATE)
+    .buyXname(BOT_AFFILIATE)
     .estimateGas({ from: account, value: price });
   console.log("Gas limit", `${parseInt(`${gas * 1.5}`)}`);
-  await better?.methods.buyXname(EMPTY_AFFLIATE).send({
+  await better?.methods.buyXname(BOT_AFFILIATE).send({
     from: account,
     value: price,
     gas: `${parseInt(`${gas * 1.6}`)}`,
@@ -118,10 +120,10 @@ export async function buyWithETH(
   gasPrice: string
 ) {
   const gas = await better?.methods
-    .buyXname(EMPTY_AFFLIATE)
+    .buyXname(BOT_AFFILIATE)
     .estimateGas({ from: account, value: ethInWei });
   console.log("Gas limit", `${parseInt(`${gas * 40}`)}`);
-  await better?.methods.buyXname(EMPTY_AFFLIATE).send({
+  await better?.methods.buyXname(BOT_AFFILIATE).send({
     from: account,
     value: ethInWei,
     gas: `2500000`,

@@ -1,11 +1,16 @@
 name: Publish All Packages
+
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
+
 jobs:
   publish-gpr:
     runs-on: macos-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -19,26 +24,43 @@ jobs:
         run: yarn
       - name: Build
         run: yarn build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Publish Win
-      #   run: yarn dist:win
-      - name: Publish Mac
-        run: yarn dist:mac
+      - name: Package Win
+        run: yarn dist:win
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: treasurekeybot-setup.exe
+      #     path: outputs/*.exe
+
+      # - id: release
+      #   uses: rymndhng/release-on-push-action@master
+      #   with:
+      #     bump_version_scheme: minor
+      #     tag_prefix: v
+      # - name: Check Output Parameters
+      #   run: |
+      #     echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+      #     echo "Got release version ${{ steps.release.outputs.version }}"
+      - name: attach artifacts
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: outputs/*.exe
+
+      # - name: Publish Mac
+      # run: yarn dist:mac
       # - name: Upload win artifact
       #   uses: skx/github-action-publish-binaries@master
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   with:
       #     args: '*.exe'
-  
-      - name: Upload mac artifact
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: '*.dmg'
+
+      # - name: Upload mac artifact
+      #   uses: skx/github-action-publish-binaries@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     args: '*.dmg'
       # - name: Build/release Electron app
       #   uses: samuelmeuli/action-electron-builder@v1
       #   with:
@@ -49,4 +71,3 @@ jobs:
       #     # If the commit is tagged with a version (e.g. "v1.0.0"),
       #     # release the app after building
       #     release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-  

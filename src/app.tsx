@@ -23,6 +23,7 @@ const App = () => {
   const [form] = Form.useForm();
   const [connecting, setConnecting] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [userInfo, setUserInfo] = useState({ address: "", playerName: "" });
   const [snipeModeOn, setSnipeModeOn] = useState(false);
   const [afkModeOn, setAFKModeOn] = useState(false);
   const [keysToBuy, setKeysToBuy] = useState(1.1);
@@ -69,21 +70,24 @@ const App = () => {
   const logout = useCallback((e) => {
     settings.set("settings", {});
     setLoginSuccess(false);
+    setUserInfo({ address: "", playerName: "" });
   }, []);
 
   useEffect(() => {
-    ipcRenderer.on("loginSuccess", () => {
-      message.success("Private key loaded!");
+    ipcRenderer.on("loginSuccess", (_, arg) => {
+      message.success(`Private key loaded!`);
       setLoginSuccess(true);
+      setUserInfo(arg);
       setConnecting(false);
     });
     ipcRenderer.on("loginFailed", () => {
       message.error("Failed to save private key, please ensure it is valid!");
       setLoginSuccess(false);
+      setUserInfo({ address: "", playerName: "" });
       setConnecting(false);
     });
-    ipcRenderer.on("logs", (e) => {
-      console.log(e);
+    ipcRenderer.on("logs", (e, msg) => {
+      console.log(msg);
     });
 
     settings.get("settings").then((e: any) => {
@@ -124,6 +128,9 @@ const App = () => {
                 <Divider>Bot Configuration</Divider>
                 <br />
                 <div>
+                  <h3>User Info</h3>
+                  <p>Address: {userInfo.address}</p>
+                  <p>Player Name: {userInfo.playerName}</p>
                   <h3>Round Start Sniper</h3>
                   <p>Number of BNB to spend when sniping</p>
                   <InputNumber

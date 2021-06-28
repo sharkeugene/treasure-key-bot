@@ -1,6 +1,6 @@
 {
   "name": "treasure-key-bot",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Treasure key bot to help players play the game automatically",
   "main": "./dist/main.js",
   "scripts": {
@@ -11,12 +11,15 @@
     "build:react": "NODE_ENV=production webpack --config webpack.react.config.js --mode production",
     "build": "npm run build:electron && npm run build:react",
     "pack": "electron-builder --dir",
-    "dist": "yarn dist:mac && dist:win && dist:linux",
+    "dist": "yarn dist:mac && yarn dist:win && yarn dist:linux",
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux",
     "package-linux": "electron-packager .  treasure-key-bot --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
-    "package-debian": "electron-installer-debian --src release-builds/treasure-key-bot-linux-x64/ --arch amd64 --config debian.json"
+    "package-debian": "electron-installer-debian --src release-builds/treasure-key-bot-linux-x64/ --arch amd64 --config debian.json",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags",
+    "bump": "npm version patch -m \"bump version to %s\""
   },
   "keywords": [],
   "author": "shark",
