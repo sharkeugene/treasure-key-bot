@@ -1,6 +1,6 @@
 {
   "name": "treasure-key-bot",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Treasure key bot to help players play the game automatically",
   "main": "./dist/main.js",
   "scripts": {
