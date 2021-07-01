@@ -26,6 +26,8 @@ jobs:
         run: yarn build
       - name: Package Win
         run: yarn dist:win
+      - name: Package Mac
+        run: yarn dist:mac
       # - uses: actions/upload-artifact@v2
       #   with:
       #     name: treasurekeybot-setup.exe
@@ -45,6 +47,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: outputs/*.exe
+
+      - name: attach artifacts
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: outputs/*.dmg
 
       # - name: Publish Mac
       # run: yarn dist:mac
