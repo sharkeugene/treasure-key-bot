@@ -37,12 +37,17 @@ export async function getCurrentRoundInfo(better: any) {
   const roundInfo = (await better?.methods
     .getCurrentRoundInfo()
     .call()) as Response;
-  const pastRoundInfo = (await better?.methods
-    .getPastRoundInfo(parseInt(roundInfo[1]) - 1)
-    .call()) as Response;
+  let firstRound = roundInfo[1] == "0";
+  let pastPot = '0';
+  if (!firstRound) {
+    const pastRoundInfo = (await better?.methods
+      .getPastRoundInfo(parseInt(roundInfo[1]) - 1)
+      .call()) as Response;
+    pastPot = pastRoundInfo[5];
+  }
   const accruedBnb =
     parseFloat(Web3.utils.fromWei(roundInfo[5])) -
-    parseFloat(Web3.utils.fromWei(pastRoundInfo[5])) / 2;
+    parseFloat(Web3.utils.fromWei(pastPot)) / 2;
   const antiwhale = accruedBnb <= 6;
   const antiwhaleBnbRemaining = (6 - accruedBnb) / 0.6;
   return {
