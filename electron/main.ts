@@ -19,10 +19,12 @@ let IS_BUYING = false;
 // SNIPE mode variables
 let SNIPE_ETH_TO_SPEND = "1";
 let SNIPE_GAS_TO_SPEND = "10";
+let SNIPE_SELECTED_CHEST = "0x3718B1a1Bae216055adb1330E142546A9b11Fb33";
 
 // AFK mode variables
 let AFK_KEYS_TO_BUY = "1.1"; // number of keys to buy
 let AFK_SECONDS_TO_BUY = 15; // number of seconds before bot starts sending a buy order
+let AFK_SELECTED_CHEST = "0x3718B1a1Bae216055adb1330E142546A9b11Fb33";
 
 function log(msg: any) {
   console.log(msg);
@@ -69,7 +71,7 @@ function createWindow() {
     try {
       CONTRACTS = await load(password);
       const player = await getPlayerInfo(
-        CONTRACTS.better,
+        CONTRACTS.better("0x3718B1a1Bae216055adb1330E142546A9b11Fb33"),
         CONTRACTS.account.address
       );
       console.log(player);
@@ -89,19 +91,20 @@ function createWindow() {
   // TODO: enable the use of settings to tweak number of keys bought
   //TODO: enable the use of settings to tweak frequency of polling
   ipcMain.on("enableStartSnipe", async (_, arg) => {
-    const { ethToSpend, gasToSpend = "10" } = arg;
+    const { ethToSpend, gasToSpend = "10", selectedChest } = arg;
     log(`ethToSpend: ${ethToSpend}, gasToSpend: ${gasToSpend}`);
     SNIPE_ETH_TO_SPEND = `${ethToSpend}`;
     SNIPE_GAS_TO_SPEND = gasToSpend;
+    SNIPE_SELECTED_CHEST = selectedChest;
 
     // Stores the current round ID, when bot is turned on
-    const info = await getCurrentRoundInfo(CONTRACTS.better);
+    const info = await getCurrentRoundInfo(CONTRACTS.better(SNIPE_SELECTED_CHEST));
     LAST_ROUND = info.roundId;
 
     if (SNIPE_START_INTERVAL === null) {
       log("Starting snipe mode...");
       SNIPE_START_INTERVAL = setInterval(async () => {
-        const info = await getCurrentRoundInfo(CONTRACTS.better);
+        const info = await getCurrentRoundInfo(CONTRACTS.better(SNIPE_SELECTED_CHEST));
 
         const potSize = parseFloat(Web3.utils.fromWei(info.currentPot)).toFixed(
           2
@@ -118,16 +121,12 @@ function createWindow() {
           LAST_ROUND = info.roundId;
           log("Sniping for keys now...");
           await buyWithETH(
-            CONTRACTS.better,
+            CONTRACTS.better(SNIPE_SELECTED_CHEST),
             CONTRACTS.account.address,
             Web3.utils.toWei(SNIPE_ETH_TO_SPEND, "ether"),
             SNIPE_GAS_TO_SPEND
           );
           log("after buyWithETH");
-          // mainWindow?.webContents?.send?.(
-          //   "logs",
-          //   `[StartSniper] - Bought 140 keys at ${Date.now()}`
-          // );
           IS_BUYING = false;
         }
       }, 800);
@@ -140,17 +139,18 @@ function createWindow() {
 
   // TODO: need test logic works
   ipcMain.on("enableAFKMode", async (_, arg) => {
-    const { keysToBuy = "1.1", secondsToBuy = 15 } = arg;
+    const { keysToBuy = "1.1", secondsToBuy = 15, selectedChest } = arg;
     console.log({ keysToBuy, secondsToBuy });
     AFK_KEYS_TO_BUY = `${keysToBuy}`;
     AFK_SECONDS_TO_BUY = secondsToBuy;
+    AFK_SELECTED_CHEST = selectedChest;
 
     if (AFK_MODE_INTERVAL === null) {
       log("Starting AFK mode...");
       AFK_MODE_INTERVAL = setInterval(async () => {
-        const info = await getCurrentRoundInfo(CONTRACTS.better);
+        const info = await getCurrentRoundInfo(CONTRACTS.better(AFK_SELECTED_CHEST));
         const player = await getPlayerInfo(
-          CONTRACTS.better,
+          CONTRACTS.better(AFK_SELECTED_CHEST),
           CONTRACTS.account.address
         );
         LAST_ROUND = info.roundId;
@@ -166,7 +166,7 @@ function createWindow() {
           IS_BUYING = true;
           log("Buying key(s) now...");
           await buyKeys(
-            CONTRACTS.better,
+            CONTRACTS.better(AFK_SELECTED_CHEST),
             CONTRACTS.account.address,
             AFK_KEYS_TO_BUY
           );

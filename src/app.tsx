@@ -13,6 +13,7 @@ import {
   Divider,
   Slider,
   InputNumber,
+  Select,
 } from "antd";
 import "antd/dist/antd.css";
 
@@ -30,6 +31,9 @@ const App = () => {
   const [secondsToBuy, setSecondsToBuy] = useState(15);
   const [ethToSpend, setEthToSpend] = useState(1.0);
   const [gasToSpend, setGasToSpend] = useState(5);
+  const [selectedChest, setSelectedChest] = useState(
+    "0x3718B1a1Bae216055adb1330E142546A9b11Fb33"
+  );
 
   const login = useCallback((e) => {
     const newSettings = {
@@ -44,27 +48,27 @@ const App = () => {
     (e) => {
       console.log("starting");
       setSnipeModeOn(!snipeModeOn);
-      ipcRenderer.send("enableStartSnipe", { ethToSpend, gasToSpend });
+      ipcRenderer.send("enableStartSnipe", { ethToSpend, gasToSpend, selectedChest });
       if (!snipeModeOn) {
         message.success("Start round sniper on!");
       } else {
         message.success("Start round sniper off!");
       }
     },
-    [ethToSpend, gasToSpend, snipeModeOn]
+    [ethToSpend, gasToSpend, snipeModeOn, selectedChest]
   );
 
   const startAFKMode = useCallback(
     (e) => {
       setAFKModeOn(!afkModeOn);
-      ipcRenderer.send("enableAFKMode", { keysToBuy, secondsToBuy });
+      ipcRenderer.send("enableAFKMode", { keysToBuy, secondsToBuy, selectedChest });
       if (!afkModeOn) {
         message.success("AFK mode on!");
       } else {
         message.success("AFK mode off!");
       }
     },
-    [keysToBuy, secondsToBuy, afkModeOn]
+    [keysToBuy, secondsToBuy, afkModeOn, selectedChest]
   );
 
   const logout = useCallback((e) => {
@@ -130,9 +134,37 @@ const App = () => {
                 <div>
                   <h3>User Info</h3>
                   <p>Address: {userInfo.address}</p>
-                  <p>Player Name: {userInfo.playerName}</p>
+                  <p>Player Name: {userInfo?.playerName ? userInfo?.playerName : "A random pirate"}</p>
+
+                  <p>Select a chest:</p>
+                  <Select
+                    value={selectedChest}
+                    onChange={(e) => setSelectedChest(e)}
+                    style={{ width: "100%", marginBottom: 25 }}
+                  >
+                    <Select.Option
+                      key="0x3718B1a1Bae216055adb1330E142546A9b11Fb33"
+                      value="0x3718B1a1Bae216055adb1330E142546A9b11Fb33"
+                    >
+                      Jungle (0x3718B1a1Bae216055adb1330E142546A9b11Fb33)
+                    </Select.Option>
+                    <Select.Option
+                      key="0xc9bEf8927c9765f2B458F83a1B84914E3B6d2f15"
+                      value="0xc9bEf8927c9765f2B458F83a1B84914E3B6d2f15"
+                    >
+                      Wault (0xc9bEf8927c9765f2B458F83a1B84914E3B6d2f15)
+                    </Select.Option>
+                    <Select.Option
+                      key="0x4C4608550fbECEf7f969b7659c356E0ADf786aDE"
+                      value="0x4C4608550fbECEf7f969b7659c356E0ADf786aDE"
+                    >
+                      Ape (0x4C4608550fbECEf7f969b7659c356E0ADf786aDE)
+                    </Select.Option>
+                  </Select>
+
                   <h3>Round Start Sniper</h3>
                   <p>Number of BNB to spend when sniping</p>
+
                   <InputNumber
                     value={ethToSpend}
                     onChange={(e) => setEthToSpend(parseFloat(`${e}`) ?? 1)}

@@ -30,10 +30,15 @@ export async function load(key: string) {
     Team.abi as any,
     TEAM
   );
-  const better = new web3.eth.Contract(
-    TreasureKeyBet.abi as any,
-    BETTER
-  );
+
+  function better(address: string) {
+    const better = new web3.eth.Contract(
+      TreasureKeyBet.abi as any,
+      address
+    );
+    return better;
+  }
+  
 
   return {
     team,
