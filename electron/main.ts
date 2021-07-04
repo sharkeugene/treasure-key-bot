@@ -129,7 +129,7 @@ function createWindow() {
           log("after buyWithETH");
           IS_BUYING = false;
         }
-      }, 800);
+      }, 500);
     } else {
       clearInterval(SNIPE_START_INTERVAL);
       SNIPE_START_INTERVAL = null;

@@ -160,6 +160,12 @@ const App = () => {
                     >
                       Ape (0x4C4608550fbECEf7f969b7659c356E0ADf786aDE)
                     </Select.Option>
+                    <Select.Option
+                      key="0x1dC908DEd91D0458A96049168815165316642139"
+                      value="0x1dC908DEd91D0458A96049168815165316642139"
+                    >
+                      BSC (0x1dC908DEd91D0458A96049168815165316642139)
+                    </Select.Option>
                   </Select>
 
                   <h3>Round Start Sniper</h3>
